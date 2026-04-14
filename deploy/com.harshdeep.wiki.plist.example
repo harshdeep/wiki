@@ -26,6 +26,10 @@
         <string>/Users/user/PATH_TO_VAULT</string>
         <key>COOKIE_SECURE</key>
         <string>1</string>
+        <key>NKR_CMD</key>
+        <string>/Users/harshdeepsingh/Build/nkr/.venv/bin/nkr</string>
+        <key>NKR_CWD</key>
+        <string>/Users/harshdeepsingh/Build/nkr</string>
         <!-- REPLACE the two values below before loading -->
         <key>WIKI_PASSWORD</key>
         <string>REPLACE_ME</string>

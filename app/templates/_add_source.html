@@ -1,0 +1,35 @@
+<button type="button"
+        class="icon-btn add-source-btn"
+        aria-label="Add source"
+        onclick="document.getElementById('add-source-dialog').showModal()">
+  <span aria-hidden="true">+</span>
+  <span class="label">Add source</span>
+</button>
+
+<dialog id="add-source-dialog" class="add-source-dialog">
+  <form method="post" action="/sources/new">
+    <h2>Add source</h2>
+    <label>
+      <span>URL</span>
+      <input type="url"
+             name="url"
+             required
+             autofocus
+             placeholder="https://example.com/article">
+    </label>
+    {% if prefill_topic %}
+      <input type="hidden" name="topic" value="{{ prefill_topic }}">
+      <p class="muted dialog-note">Will be added to <strong>{{ prefill_topic }}</strong>.</p>
+    {% else %}
+      <p class="muted dialog-note">Topic will be auto-detected on the next <code>nkr learn</code> run.</p>
+    {% endif %}
+    <div class="dialog-actions">
+      <button type="button"
+              class="ghost"
+              onclick="document.getElementById('add-source-dialog').close()">
+        Cancel
+      </button>
+      <button type="submit" class="primary">Add</button>
+    </div>
+  </form>
+</dialog>

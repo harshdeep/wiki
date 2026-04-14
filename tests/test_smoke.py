@@ -17,6 +17,7 @@ os.environ.setdefault("SECRET_KEY", "testkey")
 from app.content import build_index  # noqa: E402
 from app.markdown_render import make_renderer, Resolved  # noqa: E402
 from app.slugs import normalize, slugify  # noqa: E402
+from app.sources_writer import normalize_url, slug_from_url  # noqa: E402
 
 
 def _fixture(root: Path) -> None:
@@ -53,6 +54,33 @@ def test_slugify() -> None:
 def test_normalize_roundtrip() -> None:
     assert normalize("Self-Attention") == normalize("self-attention")
     assert normalize("  Foo  Bar  ") == "foo bar"
+
+
+def test_normalize_url() -> None:
+    # Same URL, different trailing slash / case / fragment → same key
+    a = normalize_url("https://Example.COM/path/")
+    b = normalize_url("https://example.com/path")
+    c = normalize_url("https://example.com/path#section")
+    assert a == b == c, (a, b, c)
+
+    # Query strings matter
+    assert normalize_url("https://x.com/a?v=1") != normalize_url("https://x.com/a?v=2")
+
+    # Different protocols don't collide
+    assert normalize_url("http://x.com/a") != normalize_url("https://x.com/a")
+
+    # Whitespace trimmed
+    assert normalize_url("  https://x.com/a ") == normalize_url("https://x.com/a")
+
+
+def test_slug_from_url_file_extensions() -> None:
+    # arxiv-style IDs with dots must not be treated as file extensions
+    assert slug_from_url("https://arxiv.org/abs/1706.03762") == "1706-03762"
+    # real web extensions are stripped
+    assert slug_from_url("https://docs.python.org/3/library/asyncio.html") == "asyncio"
+    assert slug_from_url("https://x.com/paper.pdf") == "paper"
+    # host fallback when no path
+    assert slug_from_url("https://example.com") == "example-com"
 
 
 def test_wikilink_resolver() -> None:

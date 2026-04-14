@@ -46,6 +46,7 @@ class Concept:
     citations: list[Citation]  # resolved references from `sources:` frontmatter
     created: str | None
     body_html: str
+    mtime: float = 0.0  # filesystem mtime (seconds since epoch)
     backlinks: list[tuple[str, str]] = field(default_factory=list)  # (slug, title)
     is_summary: bool = False
 
@@ -72,6 +73,7 @@ class Source:
     topic: str | None
     added: str | None
     body_html: str
+    mtime: float = 0.0
 
 
 @dataclass
@@ -96,13 +98,17 @@ class Index:
 # ---------------------------------------------------------------------------
 
 
-def _read(path: Path) -> tuple[dict, str]:
+def _read(path: Path) -> tuple[dict, str, float]:
+    try:
+        mtime = path.stat().st_mtime
+    except OSError:
+        mtime = 0.0
     try:
         post = frontmatter.load(path)
     except Exception:
         log.exception("failed to parse frontmatter for %s", path)
-        return {}, path.read_text(errors="replace")
-    return post.metadata or {}, post.content or ""
+        return {}, path.read_text(errors="replace"), mtime
+    return post.metadata or {}, post.content or "", mtime
 
 
 def _coerce_str(v) -> str | None:
@@ -140,31 +146,31 @@ def build_index(root: Path) -> Index:
     concepts_dir = root / "Concepts"
     sources_dir = root / "Sources"
 
-    raw_concepts: list[tuple[Path, dict, str]] = []
-    raw_topics: list[tuple[Path, dict, str]] = []
-    raw_sources: list[tuple[Path, dict, str]] = []
+    raw_concepts: list[tuple[Path, dict, str, float]] = []
+    raw_topics: list[tuple[Path, dict, str, float]] = []
+    raw_sources: list[tuple[Path, dict, str, float]] = []
 
     if concepts_dir.is_dir():
         for p in concepts_dir.glob("*.md"):
             if p.stem.lower() in _SKIP_CONCEPT_STEMS:
                 continue
-            meta, body = _read(p)
-            raw_concepts.append((p, meta, body))
+            meta, body, mtime = _read(p)
+            raw_concepts.append((p, meta, body, mtime))
     if topics_dir.is_dir():
         for p in topics_dir.glob("*.md"):
-            meta, body = _read(p)
-            raw_topics.append((p, meta, body))
+            meta, body, mtime = _read(p)
+            raw_topics.append((p, meta, body, mtime))
     if sources_dir.is_dir():
         for p in sources_dir.glob("*.md"):
-            meta, body = _read(p)
-            raw_sources.append((p, meta, body))
+            meta, body, mtime = _read(p)
+            raw_sources.append((p, meta, body, mtime))
 
     concept_by_norm: dict[str, str] = {}
     source_by_norm: dict[str, str] = {}
 
-    for p, _, _ in raw_concepts:
+    for p, *_ in raw_concepts:
         concept_by_norm[normalize(p.stem)] = slugify(p.stem)
-    for p, _, _ in raw_sources:
+    for p, *_ in raw_sources:
         source_by_norm[normalize(p.stem)] = slugify(p.stem)
 
     def resolver(target: str) -> Resolved:
@@ -179,7 +185,7 @@ def build_index(root: Path) -> Index:
 
     # --- Concepts ---------------------------------------------------------
     concepts: dict[str, Concept] = {}
-    for path, meta, body in raw_concepts:
+    for path, meta, body, mtime in raw_concepts:
         title = path.stem
         slug = slugify(title)
         topic = _coerce_str(meta.get("topic"))
@@ -206,12 +212,13 @@ def build_index(root: Path) -> Index:
             citations=citations,
             created=created,
             body_html=body_html,
+            mtime=mtime,
             is_summary=title.lower().startswith("summary - "),
         )
 
     # --- Sources ----------------------------------------------------------
     sources: dict[str, Source] = {}
-    for path, meta, body in raw_sources:
+    for path, meta, body, mtime in raw_sources:
         title = path.stem
         slug = slugify(title)
         sources[slug] = Source(
@@ -221,11 +228,12 @@ def build_index(root: Path) -> Index:
             topic=_coerce_str(meta.get("topic")),
             added=_coerce_str(meta.get("added")),
             body_html=render(body),
+            mtime=mtime,
         )
 
     # --- Topics -----------------------------------------------------------
     topics: dict[str, Topic] = {}
-    for path, _meta, body in raw_topics:
+    for path, _meta, body, _mtime in raw_topics:
         title = path.stem
         slug = slugify(title)
         topic_concepts: list[tuple[str, str]] = []
@@ -276,11 +284,25 @@ def build_index(root: Path) -> Index:
         if not any(s == c.slug for s, _ in tp.concepts):
             tp.concepts.append((c.slug, c.title))
 
+    # Same for sources: if the source has a real topic in frontmatter, make
+    # sure it appears on that topic's page. Skip when no matching topic
+    # exists (e.g. `auto-detect` placeholders written by the wiki UI — those
+    # stay orphaned until nkr's next processing run rewrites them).
+    for s in sources.values():
+        if not s.topic:
+            continue
+        t_slug = topic_titles_by_norm.get(normalize(s.topic))
+        if t_slug is None:
+            continue
+        tp = topics[t_slug]
+        if not any(slug == s.slug for slug, _ in tp.sources):
+            tp.sources.append((s.slug, s.title))
+
     # --- Backlinks --------------------------------------------------------
     # A concept X links to Y if [[Y]] appears in X's source body. We computed
     # body_html already, but it's easier to scan raw bodies for [[...]].
     raw_body_by_slug: dict[str, str] = {
-        slugify(p.stem): body for (p, _m, body) in raw_concepts
+        slugify(p.stem): body for (p, _m, body, _t) in raw_concepts
     }
     for src_slug, body in raw_body_by_slug.items():
         seen: set[str] = set()
@@ -297,7 +319,10 @@ def build_index(root: Path) -> Index:
                 dst.backlinks.append((src.slug, src.title))
 
     for c in concepts.values():
-        c.backlinks.sort(key=lambda pair: pair[1].lower())
+        c.backlinks.sort(
+            key=lambda pair: concepts[pair[0]].mtime if pair[0] in concepts else 0.0,
+            reverse=True,
+        )
 
     return Index(
         topics=topics,

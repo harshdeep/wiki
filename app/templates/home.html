@@ -2,7 +2,10 @@
 {% block title %}Topics · Wiki{% endblock %}
 {% block content %}
   <section class="home">
-    <h1>Topics</h1>
+    <div class="page-header">
+      <h1>Topics</h1>
+      {% include "_add_source.html" %}
+    </div>
     <p class="muted">
       {{ index.topics|length }} topics ·
       {{ index.concepts|length }} concepts ·

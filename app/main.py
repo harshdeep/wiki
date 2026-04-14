@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -12,8 +13,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from . import auth, sync
+from . import auth, nkr_client, sources_writer, sync
 from .content import holder
+from .slugs import slugify as _slugify
 
 logging.basicConfig(
     level=logging.INFO,
@@ -61,7 +63,11 @@ async def http_exc(request: Request, exc: HTTPException):
         return templates.TemplateResponse(
             request, "404.html", {"message": exc.detail or "Not found"}, status_code=404
         )
-    raise exc
+    return Response(
+        content=str(exc.detail or ""),
+        status_code=exc.status_code,
+        headers=exc.headers,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -141,9 +147,9 @@ async def topic_page(request: Request, slug: str, _: None = Depends(require_auth
         "topic.html",
         {
             "topic": topic,
-            "concepts": sorted(real_concepts, key=lambda c: c.title.lower()),
-            "summaries": sorted(summaries, key=lambda c: c.title.lower()),
-            "sources": sorted(sources, key=lambda s: s.title.lower()),
+            "concepts": sorted(real_concepts, key=lambda c: c.mtime, reverse=True),
+            "summaries": sorted(summaries, key=lambda c: c.mtime, reverse=True),
+            "sources": sorted(sources, key=lambda s: s.mtime, reverse=True),
         },
     )
 
@@ -162,6 +168,32 @@ async def concept_page(request: Request, slug: str, _: None = Depends(require_au
     return templates.TemplateResponse(
         request, "concept.html", {"c": c, "topic": topic}
     )
+
+
+@app.post("/sources/new")
+async def add_source(
+    request: Request,
+    url: str = Form(...),
+    topic: str = Form(""),
+    _: None = Depends(require_auth),
+):
+    u = url.strip()
+    if not u.lower().startswith(("http://", "https://")):
+        raise HTTPException(400, "URL must start with http:// or https://")
+
+    # If this URL was already added, redirect to the existing source
+    # instead of writing a duplicate file or kicking off another nkr run.
+    target = sources_writer.normalize_url(u)
+    idx = holder.get()
+    for existing in idx.sources.values():
+        if existing.url and sources_writer.normalize_url(existing.url) == target:
+            return RedirectResponse(f"/sources/{existing.slug}", status_code=303)
+
+    t = topic.strip() or None
+    path = await asyncio.to_thread(sources_writer.write_source, u, t)
+    await nkr_client.trigger_process()
+    slug = _slugify(path.stem)
+    return RedirectResponse(f"/sources/{slug}", status_code=303)
 
 
 @app.get("/sources/{slug}", response_class=HTMLResponse)
@@ -190,7 +222,7 @@ async def source_page(request: Request, slug: str, _: None = Depends(require_aut
         {
             "s": s,
             "topic": topic,
-            "citing": sorted(citing, key=lambda c: c.title.lower()),
-            "summaries": sorted(summaries, key=lambda c: c.title.lower()),
+            "citing": sorted(citing, key=lambda c: c.mtime, reverse=True),
+            "summaries": sorted(summaries, key=lambda c: c.mtime, reverse=True),
         },
     )

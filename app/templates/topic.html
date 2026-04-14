@@ -3,7 +3,11 @@
 {% block content %}
   <article class="topic">
     <nav class="crumbs"><a href="/">Topics</a> <span>/</span> {{ topic.title }}</nav>
-    <h1>{{ topic.title }}</h1>
+    <div class="page-header">
+      <h1>{{ topic.title }}</h1>
+      {% set prefill_topic = topic.title %}
+      {% include "_add_source.html" %}
+    </div>
 
     {% if concepts %}
       <section>

@@ -142,6 +142,129 @@ p {
   margin: 0.9em 0;
 }
 
+.page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.2em 0 0.6em;
+  flex-wrap: wrap;
+}
+.page-header h1 {
+  margin: 0;
+}
+
+.icon-btn {
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem 0.4rem;
+  font-size: 0.88rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.icon-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.icon-btn span[aria-hidden] {
+  font-size: 1.1rem;
+  line-height: 1;
+  font-weight: 500;
+}
+
+dialog.add-source-dialog {
+  padding: 0;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--fg);
+  max-width: 440px;
+  width: calc(100% - 2rem);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+dialog.add-source-dialog::backdrop {
+  background: rgba(10, 10, 10, 0.55);
+  backdrop-filter: blur(3px);
+}
+dialog.add-source-dialog form {
+  padding: 1.6rem 1.6rem 1.3rem;
+}
+dialog.add-source-dialog h2 {
+  margin: 0 0 0.9rem;
+  font-size: 1.15rem;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+dialog.add-source-dialog label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+dialog.add-source-dialog label span {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+dialog.add-source-dialog input[type="url"] {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: inherit;
+}
+dialog.add-source-dialog input[type="url"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.dialog-note {
+  margin: 0.7rem 0 1rem;
+  font-size: 0.85rem;
+}
+.dialog-note code {
+  background: var(--code-bg);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+.dialog-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  margin-top: 0.4rem;
+}
+.dialog-actions button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  cursor: pointer;
+}
+.dialog-actions button.ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dialog-actions button.primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.dialog-actions button.primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
 .crumbs {
   font-size: 0.85rem;
   color: var(--muted);
