@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ s.title }} · Wiki{% endblock %}
+{% block content %}
+  <article class="source">
+    <nav class="crumbs">
+      <a href="/">Topics</a>
+      {% if topic %}<span>/</span> <a href="/topics/{{ topic.slug }}">{{ topic.title }}</a>{% endif %}
+      <span>/</span> {{ s.title }}
+    </nav>
+    <h1>{{ s.title }}</h1>
+    <p class="muted">
+      {% if s.url %}<a href="{{ s.url }}" rel="noreferrer noopener">{{ s.url }}</a>{% endif %}
+      {% if s.added %} · added {{ s.added }}{% endif %}
+    </p>
+
+    {% if summaries %}
+      <section class="meta">
+        <h3>Summaries</h3>
+        <ul class="linklist">
+          {% for c in summaries %}
+            <li><a href="/concepts/{{ c.slug }}">{{ c.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if citing %}
+      <section class="meta">
+        <h3>Concepts citing this source</h3>
+        <ul class="linklist">
+          {% for c in citing %}
+            <li><a href="/concepts/{{ c.slug }}">{{ c.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    <details class="raw">
+      <summary>Raw source content</summary>
+      <div class="markdown">{{ s.body_html | safe }}</div>
+    </details>
+  </article>
+{% endblock %}

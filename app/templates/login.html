@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Log in · Wiki</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script>
+      (function () {
+        const stored = localStorage.getItem("theme");
+        if (stored === "dark" || stored === "light") {
+          document.documentElement.setAttribute("data-theme", stored);
+        }
+      })();
+    </script>
+  </head>
+  <body class="login-page">
+    <main>
+      <form class="login-form" method="post" action="/login">
+        <h1>📚 Wiki</h1>
+        {% if error %}<p class="error">{{ error }}</p>{% endif %}
+        <label>
+          Password
+          <input type="password" name="password" autofocus required />
+        </label>
+        <input type="hidden" name="next" value="{{ next }}" />
+        <button type="submit">Log in</button>
+      </form>
+    </main>
+  </body>
+</html>

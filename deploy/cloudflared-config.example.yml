@@ -1,0 +1,12 @@
+# ~/.cloudflared/config.yml
+#
+# Replace <TUNNEL_ID> with the UUID printed by `cloudflared tunnel create wiki`
+# and set hostname to whatever DNS record you routed to the tunnel.
+
+tunnel: <TUNNEL_ID>
+credentials-file: /Users/harshdeepsingh/.cloudflared/<TUNNEL_ID>.json
+
+ingress:
+  - hostname: wiki.example.com
+    service: http://127.0.0.1:8765
+  - service: http_status:404

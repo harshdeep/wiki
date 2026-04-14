@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+deploy/com.harshdeep.wiki.plist
+content/
+*.egg-info/
+dist/
+build/
+.DS_Store
+.pytest_cache/

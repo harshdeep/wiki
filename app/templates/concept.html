@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ c.title }} · Wiki{% endblock %}
+{% block content %}
+  <article class="concept">
+    <nav class="crumbs">
+      <a href="/">Topics</a>
+      {% if topic %}<span>/</span> <a href="/topics/{{ topic.slug }}">{{ topic.title }}</a>{% endif %}
+      <span>/</span> {{ c.title }}
+    </nav>
+    <h1>{{ c.title }}</h1>
+    {% if c.created %}
+      <p class="muted">Created {{ c.created }}{% if c.is_summary %} · Summary{% endif %}</p>
+    {% endif %}
+
+    <div class="markdown">{{ c.body_html | safe }}</div>
+
+    {% if c.citations %}
+      <section class="meta">
+        <h3>Sources</h3>
+        <ul class="linklist">
+          {% for cit in c.citations %}
+            <li>
+              {% if cit.kind == "source" %}
+                <a href="/sources/{{ cit.slug }}">{{ cit.title }}</a>
+              {% elif cit.kind == "concept" %}
+                <a href="/concepts/{{ cit.slug }}">{{ cit.title }}</a>
+              {% else %}
+                <span class="broken-link">{{ cit.title }}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if c.backlinks %}
+      <section class="meta backlinks">
+        <h3>Linked from</h3>
+        <ul class="linklist">
+          {% for slug, title in c.backlinks %}
+            <li><a href="/concepts/{{ slug }}">{{ title }}</a></li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+  </article>
+{% endblock %}
