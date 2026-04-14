@@ -1,35 +1,52 @@
 <button type="button"
-        class="icon-btn add-source-btn"
+        class="add-source-btn"
         aria-label="Add source"
+        title="Add source"
         onclick="document.getElementById('add-source-dialog').showModal()">
-  <span aria-hidden="true">+</span>
-  <span class="label">Add source</span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 5v14M5 12h14"/>
+  </svg>
 </button>
 
 <dialog id="add-source-dialog" class="add-source-dialog">
-  <form method="post" action="/sources/new">
-    <h2>Add source</h2>
-    <label>
-      <span>URL</span>
-      <input type="url"
+  <form method="post" action="/sources/new" class="dialog-form">
+    <button type="button"
+            class="dialog-close"
+            aria-label="Close"
+            onclick="document.getElementById('add-source-dialog').close()">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <p class="dialog-eyebrow">New entry</p>
+    <h2 class="dialog-title">Add a source</h2>
+    <p class="dialog-subtitle">Paste a URL. <code>nkr</code> will read the page and extract concepts.</p>
+
+    <div class="dialog-field">
+      <label for="src-url" class="dialog-field-label">URL</label>
+      <input id="src-url"
+             type="url"
              name="url"
              required
              autofocus
-             placeholder="https://example.com/article">
-    </label>
+             placeholder="https://">
+    </div>
+
     {% if prefill_topic %}
       <input type="hidden" name="topic" value="{{ prefill_topic }}">
-      <p class="muted dialog-note">Will be added to <strong>{{ prefill_topic }}</strong>.</p>
+      <p class="dialog-note">Will be filed under <strong>{{ prefill_topic }}</strong>.</p>
     {% else %}
-      <p class="muted dialog-note">Topic will be auto-detected on the next <code>nkr learn</code> run.</p>
+      <p class="dialog-note">Topic will be auto-detected when <code>nkr</code> processes it.</p>
     {% endif %}
+
     <div class="dialog-actions">
       <button type="button"
-              class="ghost"
+              class="btn"
               onclick="document.getElementById('add-source-dialog').close()">
         Cancel
       </button>
-      <button type="submit" class="primary">Add</button>
+      <button type="submit" class="btn btn-primary">Add source</button>
     </div>
   </form>
 </dialog>

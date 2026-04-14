@@ -14,9 +14,7 @@
         <h2>Concepts</h2>
         <ul class="linklist">
           {% for c in concepts %}
-            <li>
-              <a href="/concepts/{{ c.slug }}">{{ c.title }}</a>
-            </li>
+            <li><a href="/concepts/{{ c.slug }}">{{ c.title }}</a></li>
           {% endfor %}
         </ul>
       </section>
@@ -40,7 +38,7 @@
           {% for s in sources %}
             <li>
               <a href="/sources/{{ s.slug }}">{{ s.title }}</a>
-              {% if s.url %}<span class="muted"> · <a href="{{ s.url }}" rel="noreferrer noopener">↗</a></span>{% endif %}
+              {% if s.url %}<a class="ext-link" href="{{ s.url }}" rel="noreferrer noopener" title="{{ s.url }}">↗</a>{% endif %}
             </li>
           {% endfor %}
         </ul>
@@ -48,7 +46,7 @@
     {% endif %}
 
     {% if not concepts and not summaries and not sources %}
-      <p class="muted">No concepts or sources listed yet for this topic.</p>
+      <p class="empty-note">No concepts or sources filed under this topic yet.</p>
     {% endif %}
   </article>
 {% endblock %}

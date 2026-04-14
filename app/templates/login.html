@@ -1,15 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Log in · Wiki</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Literata:opsz,wght@7..72,400..600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css" />
     <script>
       (function () {
         const stored = localStorage.getItem("theme");
-        if (stored === "dark" || stored === "light") {
-          document.documentElement.setAttribute("data-theme", stored);
+        if (stored === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
         }
       })();
     </script>
@@ -17,14 +20,13 @@
   <body class="login-page">
     <main>
       <form class="login-form" method="post" action="/login">
-        <h1>📚 Wiki</h1>
+        <h1>Wiki</h1>
+        <p class="login-form-subtitle">Personal knowledge base</p>
         {% if error %}<p class="error">{{ error }}</p>{% endif %}
-        <label>
-          Password
-          <input type="password" name="password" autofocus required />
-        </label>
+        <label for="pwd">Password</label>
+        <input id="pwd" type="password" name="password" autofocus required />
         <input type="hidden" name="next" value="{{ next }}" />
-        <button type="submit">Log in</button>
+        <button type="submit">Enter</button>
       </form>
     </main>
   </body>

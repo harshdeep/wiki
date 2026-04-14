@@ -6,20 +6,19 @@
       <h1>Topics</h1>
       {% include "_add_source.html" %}
     </div>
-    <p class="muted">
-      {{ index.topics|length }} topics ·
-      {{ index.concepts|length }} concepts ·
-      {{ index.sources|length }} sources
+    <p class="home-meta">
+      {{ index.topics|length }} topics
+      &nbsp;·&nbsp; {{ index.concepts|length }} concepts
+      &nbsp;·&nbsp; {{ index.sources|length }} sources
     </p>
     <ul class="topic-grid">
       {% for t in topics %}
         <li>
           <a class="topic-card" href="/topics/{{ t.slug }}">
             <h2>{{ t.title }}</h2>
-            <p class="muted">
-              {% set concept_count = t.concepts|selectattr(0, 'in', index.concepts)|list|length %}
+            <p class="topic-card-meta">
               {{ t.concepts|length }} concept{{ '' if t.concepts|length == 1 else 's' }}
-              · {{ t.sources|length }} source{{ '' if t.sources|length == 1 else 's' }}
+              &nbsp;·&nbsp; {{ t.sources|length }} source{{ '' if t.sources|length == 1 else 's' }}
             </p>
           </a>
         </li>

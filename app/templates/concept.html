@@ -8,8 +8,12 @@
       <span>/</span> {{ c.title }}
     </nav>
     <h1>{{ c.title }}</h1>
-    {% if c.created %}
-      <p class="muted">Created {{ c.created }}{% if c.is_summary %} · Summary{% endif %}</p>
+    {% if c.created or c.is_summary %}
+      <p class="article-meta">
+        {% if c.is_summary %}Summary{% endif %}
+        {% if c.is_summary and c.created %} &nbsp;·&nbsp; {% endif %}
+        {% if c.created %}Added {{ c.created }}{% endif %}
+      </p>
     {% endif %}
 
     <div class="markdown">{{ c.body_html | safe }}</div>
@@ -34,7 +38,7 @@
     {% endif %}
 
     {% if c.backlinks %}
-      <section class="meta backlinks">
+      <section class="meta">
         <h3>Linked from</h3>
         <ul class="linklist">
           {% for slug, title in c.backlinks %}

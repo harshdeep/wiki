@@ -8,9 +8,9 @@
       <span>/</span> {{ s.title }}
     </nav>
     <h1>{{ s.title }}</h1>
-    <p class="muted">
+    <p class="article-meta">
       {% if s.url %}<a href="{{ s.url }}" rel="noreferrer noopener">{{ s.url }}</a>{% endif %}
-      {% if s.added %} · added {{ s.added }}{% endif %}
+      {% if s.added %} &nbsp;·&nbsp; Added {{ s.added }}{% endif %}
     </p>
 
     {% if summaries %}
