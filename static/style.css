@@ -534,6 +534,16 @@ section > h2:first-child::before {
   font-style: italic;
 }
 
+/* KaTeX: inherit text color, allow wide display math to scroll */
+.markdown .katex { color: inherit; }
+.markdown .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35em 0;
+  margin: 1.2em 0;
+}
+.markdown .katex-display > .katex { white-space: nowrap; }
+
 /* =================== Meta sections (sources, backlinks) ============== */
 
 .meta {
