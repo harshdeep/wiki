@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -25,6 +25,23 @@ log = logging.getLogger("wiki")
 
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+
+def _static_version() -> str:
+    """File-mtime cache buster for /static assets.
+
+    The CSS link is rendered as `style.css?v=<mtime>`, so the URL changes
+    whenever the file is edited and browsers cleanly drop the old copy.
+    Computed per render — cheap (one stat) and always current.
+    """
+    css = BASE_DIR.parent / "static" / "style.css"
+    try:
+        return str(int(css.stat().st_mtime))
+    except OSError:
+        return "0"
+
+
+templates.env.globals["static_version"] = _static_version
 
 
 @asynccontextmanager
@@ -177,22 +194,33 @@ async def add_source(
     topic: str = Form(""),
     _: None = Depends(require_auth),
 ):
+    wants_json = "application/json" in request.headers.get("accept", "").lower()
+
     u = url.strip()
     if not u.lower().startswith(("http://", "https://")):
+        if wants_json:
+            return JSONResponse(
+                {"error": "URL must start with http:// or https://"},
+                status_code=400,
+            )
         raise HTTPException(400, "URL must start with http:// or https://")
 
-    # If this URL was already added, redirect to the existing source
+    # If this URL was already added, return/redirect to the existing source
     # instead of writing a duplicate file or kicking off another nkr run.
     target = sources_writer.normalize_url(u)
     idx = holder.get()
     for existing in idx.sources.values():
         if existing.url and sources_writer.normalize_url(existing.url) == target:
+            if wants_json:
+                return JSONResponse({"slug": existing.slug, "duplicate": True})
             return RedirectResponse(f"/sources/{existing.slug}", status_code=303)
 
     t = topic.strip() or None
     path = await asyncio.to_thread(sources_writer.write_source, u, t)
     await nkr_client.trigger_process()
     slug = _slugify(path.stem)
+    if wants_json:
+        return JSONResponse({"slug": slug})
     return RedirectResponse(f"/sources/{slug}", status_code=303)
 
 

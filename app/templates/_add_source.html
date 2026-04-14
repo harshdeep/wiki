@@ -1,52 +1,38 @@
-<button type="button"
-        class="add-source-btn"
-        aria-label="Add source"
-        title="Add source"
-        onclick="document.getElementById('add-source-dialog').showModal()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 5v14M5 12h14"/>
-  </svg>
-</button>
+<div class="add-source" data-state="idle">
+  <button type="button"
+          class="add-source-trigger"
+          aria-label="Add source"
+          title="Add source">+</button>
 
-<dialog id="add-source-dialog" class="add-source-dialog">
-  <form method="post" action="/sources/new" class="dialog-form">
+  <form class="add-source-form"
+        action="/sources/new"
+        method="post"
+        autocomplete="off">
+    <input class="add-source-input"
+           type="url"
+           name="url"
+           required
+           placeholder="Paste a URL…">
+    {% if prefill_topic %}
+      <input type="hidden" name="topic" value="{{ prefill_topic }}">
+    {% endif %}
+    <button type="submit"
+            class="add-source-submit"
+            aria-label="Save"
+            title="Save">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 13l4 4L19 7"/>
+      </svg>
+    </button>
     <button type="button"
-            class="dialog-close"
-            aria-label="Close"
-            onclick="document.getElementById('add-source-dialog').close()">
+            class="add-source-cancel"
+            aria-label="Cancel"
+            title="Cancel">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M18 6L6 18M6 6l12 12"/>
       </svg>
     </button>
-
-    <p class="dialog-eyebrow">New entry</p>
-    <h2 class="dialog-title">Add a source</h2>
-    <p class="dialog-subtitle">Paste a URL. <code>nkr</code> will read the page and extract concepts.</p>
-
-    <div class="dialog-field">
-      <label for="src-url" class="dialog-field-label">URL</label>
-      <input id="src-url"
-             type="url"
-             name="url"
-             required
-             autofocus
-             placeholder="https://">
-    </div>
-
-    {% if prefill_topic %}
-      <input type="hidden" name="topic" value="{{ prefill_topic }}">
-      <p class="dialog-note">Will be filed under <strong>{{ prefill_topic }}</strong>.</p>
-    {% else %}
-      <p class="dialog-note">Topic will be auto-detected when <code>nkr</code> processes it.</p>
-    {% endif %}
-
-    <div class="dialog-actions">
-      <button type="button"
-              class="btn"
-              onclick="document.getElementById('add-source-dialog').close()">
-        Cancel
-      </button>
-      <button type="submit" class="btn btn-primary">Add source</button>
-    </div>
   </form>
-</dialog>
+
+  <div class="add-source-status" role="status" aria-live="polite"></div>
+</div>

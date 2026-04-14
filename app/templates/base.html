@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Literata:opsz,wght@7..72,400..600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/style.css?v={{ static_version() }}" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='20' font-style='italic' fill='%23E3B46D'%3EW%3C/text%3E%3C/svg%3E" />
 
     <script>
@@ -43,6 +43,7 @@
       {% block content %}{% endblock %}
     </main>
     <script>
+      // Theme toggle
       (function () {
         const btn = document.getElementById("theme-toggle");
         if (!btn) return;
@@ -52,6 +53,99 @@
           document.documentElement.setAttribute("data-theme", next);
           localStorage.setItem("theme", next);
         });
+      })();
+
+      // Add-source inline form
+      (function () {
+        const SUCCESS_MS = 6000;
+        const ERROR_MS = 4500;
+
+        function setState(root, state) {
+          root.dataset.state = state;
+        }
+
+        function showStatus(root, text, isError) {
+          const status = root.querySelector(".add-source-status");
+          if (!status) return;
+          status.textContent = text;
+          status.classList.remove("is-dismissing");
+          setState(root, isError ? "error" : "success");
+          const ttl = isError ? ERROR_MS : SUCCESS_MS;
+          window.setTimeout(function () {
+            status.classList.add("is-dismissing");
+            window.setTimeout(function () {
+              if (root.dataset.state === "success" || root.dataset.state === "error") {
+                setState(root, "idle");
+                status.classList.remove("is-dismissing");
+                status.textContent = "";
+              }
+            }, 450);
+          }, ttl);
+        }
+
+        function bind(root) {
+          const trigger = root.querySelector(".add-source-trigger");
+          const form = root.querySelector(".add-source-form");
+          const input = root.querySelector(".add-source-input");
+          const cancel = root.querySelector(".add-source-cancel");
+          const submit = root.querySelector(".add-source-submit");
+          if (!trigger || !form || !input || !cancel || !submit) return;
+
+          trigger.addEventListener("click", function () {
+            setState(root, "open");
+            window.setTimeout(function () { input.focus(); }, 30);
+          });
+
+          cancel.addEventListener("click", function () {
+            form.reset();
+            setState(root, "idle");
+          });
+
+          input.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") {
+              form.reset();
+              setState(root, "idle");
+            }
+          });
+
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            if (root.dataset.state === "loading") return;
+            setState(root, "loading");
+            submit.disabled = true;
+            try {
+              const resp = await fetch(form.action, {
+                method: "POST",
+                body: new FormData(form),
+                headers: { "Accept": "application/json" },
+                credentials: "same-origin",
+              });
+              if (!resp.ok) {
+                let msg = "Couldn't add the source. Try again?";
+                try {
+                  const j = await resp.json();
+                  if (j && j.error) msg = j.error;
+                } catch (_) {}
+                form.reset();
+                showStatus(root, msg, true);
+                return;
+              }
+              form.reset();
+              showStatus(
+                root,
+                "Thanks, nkr will process it now. Check back for extracted concepts in a few minutes.",
+                false
+              );
+            } catch (err) {
+              form.reset();
+              showStatus(root, "Network error. Try again?", true);
+            } finally {
+              submit.disabled = false;
+            }
+          });
+        }
+
+        document.querySelectorAll(".add-source").forEach(bind);
       })();
     </script>
   </body>
