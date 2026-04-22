@@ -7,14 +7,14 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Outfit:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="/static/style.css?v={{ static_version() }}" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='20' font-style='italic' fill='%23E3B46D'%3EW%3C/text%3E%3C/svg%3E" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='20' font-style='italic' fill='%23c9a96e'%3EW%3C/text%3E%3C/svg%3E" />
 
     <script>
       (function () {
@@ -86,30 +86,78 @@
 
       // Add-source inline form
       (function () {
-        const SUCCESS_MS = 6000;
         const ERROR_MS = 4500;
+        const DONE_MS = 12000;
+        const POLL_MS = 3000;
 
         function setState(root, state) {
           root.dataset.state = state;
         }
 
-        function showStatus(root, text, isError) {
+        function showError(root, text) {
           const status = root.querySelector(".add-source-status");
-          if (!status) return;
-          status.textContent = text;
-          status.classList.remove("is-dismissing");
-          setState(root, isError ? "error" : "success");
-          const ttl = isError ? ERROR_MS : SUCCESS_MS;
+          if (status) status.textContent = text;
+          setState(root, "error");
           window.setTimeout(function () {
-            status.classList.add("is-dismissing");
-            window.setTimeout(function () {
-              if (root.dataset.state === "success" || root.dataset.state === "error") {
-                setState(root, "idle");
-                status.classList.remove("is-dismissing");
-                status.textContent = "";
+            if (root.dataset.state === "error") setState(root, "idle");
+          }, ERROR_MS);
+        }
+
+        function showDone(root, concepts) {
+          const doneEl = root.querySelector(".add-source-done");
+          const list = root.querySelector(".add-source-concepts");
+          const empty = root.querySelector(".add-source-done-empty");
+          if (!doneEl || !list) return;
+
+          list.innerHTML = "";
+          if (concepts && concepts.length > 0) {
+            if (empty) empty.hidden = true;
+            concepts.forEach(function (c) {
+              const li = document.createElement("li");
+              const a = document.createElement("a");
+              a.href = "/concepts/" + c.slug;
+              a.textContent = c.title;
+              li.appendChild(a);
+              list.appendChild(li);
+            });
+          } else {
+            if (empty) empty.hidden = false;
+          }
+          setState(root, "done");
+          window.setTimeout(function () {
+            if (root.dataset.state === "done") setState(root, "idle");
+          }, DONE_MS);
+        }
+
+        function startPolling(root) {
+          setState(root, "processing");
+          const interval = window.setInterval(async function () {
+            // Stop polling if user dismissed or navigated away
+            if (!document.body.contains(root)) {
+              window.clearInterval(interval);
+              return;
+            }
+            // Stop if user already dismissed to idle
+            if (root.dataset.state === "idle") {
+              window.clearInterval(interval);
+              return;
+            }
+            try {
+              const resp = await fetch("/sources/status", {
+                headers: { "Accept": "application/json" },
+                credentials: "same-origin",
+              });
+              if (!resp.ok) return;
+              const data = await resp.json();
+              if (data.status === "done") {
+                window.clearInterval(interval);
+                showDone(root, data.concepts);
+              } else if (data.status === "error") {
+                window.clearInterval(interval);
+                showError(root, data.error || "Processing failed. Check nkr logs.");
               }
-            }, 450);
-          }, ttl);
+            } catch (_) { /* network blip — try again next tick */ }
+          }, POLL_MS);
         }
 
         function bind(root) {
@@ -149,25 +197,25 @@
                 headers: { "Accept": "application/json" },
                 credentials: "same-origin",
               });
+              form.reset();
               if (!resp.ok) {
                 let msg = "Couldn't add the source. Try again?";
                 try {
                   const j = await resp.json();
                   if (j && j.error) msg = j.error;
                 } catch (_) {}
-                form.reset();
-                showStatus(root, msg, true);
+                showError(root, msg);
                 return;
               }
-              form.reset();
-              showStatus(
-                root,
-                "Thanks, nkr will process it now. Check back for extracted concepts in a few minutes.",
-                false
-              );
+              const data = await resp.json();
+              if (data.duplicate) {
+                showDone(root, []);
+                return;
+              }
+              startPolling(root);
             } catch (err) {
               form.reset();
-              showStatus(root, "Network error. Try again?", true);
+              showError(root, "Network error. Try again?");
             } finally {
               submit.disabled = false;
             }

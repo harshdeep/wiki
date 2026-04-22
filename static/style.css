@@ -1,29 +1,29 @@
 /* ================================================================== */
-/*  Wiki — dark navy, neutral whites, Inter                             */
-/*  Cool charcoal-blue surface with high-contrast sans typography.      */
+/*  Wiki — warm charcoal, burnished gold, Fraunces + Outfit            */
+/*  Warm dark surface with editorial serif headings.                    */
 /* ================================================================== */
 
 :root {
   /* --- Dark palette (default) --- */
-  --bg:              #0E1419;
-  --bg-inset:        #0A1015;
-  --surface:         #161D24;
-  --surface-high:    #1B232C;
-  --rule:            #222B34;
-  --rule-strong:     #2D3741;
+  --bg:              #1a1a1e;
+  --bg-inset:        #161618;
+  --surface:         #222226;
+  --surface-high:    #28282d;
+  --rule:            #2a2a2e;
+  --rule-strong:     #363638;
 
-  --fg:              #E6E6E2;
-  --fg-strong:       #FFFFFF;
-  --fg-quiet:        #A1A6AC;
-  --fg-faint:        #6B7178;
+  --fg:              #d4d0c8;
+  --fg-strong:       #ede9e0;
+  --fg-quiet:        #8a8780;
+  --fg-faint:        #5a5850;
 
-  --accent:          #7A99C4;
-  --accent-hover:    #9CB6D6;
-  --accent-dim:      #4E627B;
-  --accent-contrast: #0E1419;
+  --accent:          #c9a96e;
+  --accent-hover:    #dabb82;
+  --accent-dim:      #8a7a52;
+  --accent-contrast: #1a1a1e;
 
-  --broken:          #D77E5C;
-  --selection:       rgba(122, 153, 196, 0.30);
+  --broken:          #c35a3a;
+  --selection:       rgba(201, 169, 110, 0.25);
 
   --shadow-elevated:
     0 24px 60px -20px rgba(0, 0, 0, 0.65),
@@ -31,8 +31,9 @@
     0 0 0 1px rgba(255, 255, 255, 0.025) inset;
 
   /* --- Typography --- */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans:  "Outfit", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-mono:  "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* --- Geometry --- */
   --radius-sm: 4px;
@@ -44,29 +45,29 @@
 }
 
 html[data-theme="light"] {
-  --bg:              #F7F8FA;
-  --bg-inset:        #F0F2F5;
-  --surface:         #FFFFFF;
-  --surface-high:    #FFFFFF;
-  --rule:            #E1E5EB;
-  --rule-strong:     #C7CCD3;
+  --bg:              #f5f3ef;
+  --bg-inset:        #edeae4;
+  --surface:         #ffffff;
+  --surface-high:    #ffffff;
+  --rule:            #e0dcd4;
+  --rule-strong:     #c8c3b8;
 
-  --fg:              #1A2028;
-  --fg-strong:       #000000;
-  --fg-quiet:        #5A616A;
-  --fg-faint:        #8B9099;
+  --fg:              #2a2824;
+  --fg-strong:       #1a1a1e;
+  --fg-quiet:        #6a6560;
+  --fg-faint:        #9a9488;
 
-  --accent:          #4A6FA8;
-  --accent-hover:    #2F5694;
-  --accent-dim:      #8AA8C8;
-  --accent-contrast: #FFFFFF;
+  --accent:          #9a7a3e;
+  --accent-hover:    #7a5e2a;
+  --accent-dim:      #c9a96e;
+  --accent-contrast: #ffffff;
 
-  --broken:          #B5481E;
-  --selection:       rgba(74, 111, 168, 0.18);
+  --broken:          #b5481e;
+  --selection:       rgba(154, 122, 62, 0.18);
 
   --shadow-elevated:
-    0 24px 60px -20px rgba(20, 30, 50, 0.18),
-    0 12px 30px -15px rgba(20, 30, 50, 0.12);
+    0 24px 60px -20px rgba(20, 20, 15, 0.18),
+    0 12px 30px -15px rgba(20, 20, 15, 0.12);
 }
 
 * { box-sizing: border-box; }
@@ -98,16 +99,17 @@ body {
 /* =================== Typography ====================================== */
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   color: var(--fg-strong);
   line-height: 1.18;
   letter-spacing: -0.022em;
-  font-weight: 700;
+  font-weight: 500;
+  font-optical-sizing: auto;
 }
 
 h1 {
   font-size: clamp(1.85rem, 4.6vw, 2.4rem);
-  font-weight: 720;
+  font-weight: 400;
   letter-spacing: -0.03em;
   margin: 0.1em 0 0.5em;
   line-height: 1.12;
@@ -115,21 +117,21 @@ h1 {
 
 h2 {
   font-size: 1.32rem;
-  font-weight: 650;
+  font-weight: 500;
   letter-spacing: -0.018em;
   margin: 2em 0 0.6em;
 }
 
 h3 {
   font-size: 1.05rem;
-  font-weight: 640;
+  font-weight: 500;
   letter-spacing: -0.012em;
   margin: 1.7em 0 0.5em;
 }
 
 p { margin: 0.85em 0; }
 
-strong { color: var(--fg-strong); font-weight: 650; }
+strong { color: var(--fg-strong); font-weight: 500; }
 
 a {
   color: var(--accent);
@@ -168,9 +170,9 @@ a:hover {
 }
 
 .brand {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  font-weight: 650;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 400;
   letter-spacing: -0.01em;
   color: var(--fg-strong);
   background-image: none;
@@ -184,12 +186,12 @@ a:hover {
 }
 .brand-mark {
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent);
   font-style: normal;
 }
 .brand-text {
-  font-weight: 550;
+  font-weight: 300;
   color: var(--fg-quiet);
 }
 
@@ -245,8 +247,8 @@ main {
 }
 
 .crumbs {
-  font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   color: var(--fg-faint);
   margin: 0 0 1rem;
   letter-spacing: 0.005em;
@@ -264,13 +266,13 @@ main {
 /* =================== Home: topic cards =============================== */
 
 .home-meta {
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
   color: var(--fg-faint);
   margin: 0 0 2.6rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .topic-grid {
@@ -317,7 +319,7 @@ main {
 }
 .topic-card h2 {
   font-size: 1.18rem;
-  font-weight: 660;
+  font-weight: 500;
   letter-spacing: -0.018em;
   margin: 0 0 0.4em;
   color: var(--fg-strong);
@@ -326,10 +328,11 @@ main {
 .topic-card-meta {
   margin: 0;
   color: var(--fg-faint);
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 /* =================== Article layout ================================== */
@@ -337,21 +340,21 @@ main {
 article { position: relative; }
 
 .article-meta {
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--fg-faint);
-  font-weight: 600;
+  font-weight: 400;
   margin: -0.2em 0 2.4em;
 }
 
 article section { margin-top: 2.8rem; }
 
 section > h2:first-child {
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--fg-faint);
@@ -387,7 +390,7 @@ section > h2:first-child::before {
   background-position: 0 100%;
   background-repeat: no-repeat;
   background-size: 0% 1px;
-  font-weight: 460;
+  font-weight: 400;
 }
 .linklist li a:hover {
   color: var(--accent-hover);
@@ -420,12 +423,12 @@ section > h2:first-child::before {
 .markdown h2,
 .markdown h3,
 .markdown h4 {
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   letter-spacing: -0.018em;
   color: var(--fg-strong);
 }
-.markdown h2 { font-size: 1.28rem; margin-top: 2em; font-weight: 660; }
-.markdown h3 { font-size: 1.08rem; margin-top: 1.8em; font-weight: 640; }
+.markdown h2 { font-size: 1.28rem; margin-top: 2em; font-weight: 500; }
+.markdown h3 { font-size: 1.08rem; margin-top: 1.8em; font-weight: 500; }
 
 .markdown ul, .markdown ol {
   padding-left: 1.5em;
@@ -552,9 +555,9 @@ section > h2:first-child::before {
   border-top: 1px solid var(--rule);
 }
 .meta h3 {
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--fg-faint);
@@ -582,11 +585,11 @@ section > h2:first-child::before {
 .raw summary {
   cursor: pointer;
   color: var(--fg-faint);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  font-weight: 700;
-  font-family: var(--font-sans);
+  font-weight: 400;
+  font-family: var(--font-mono);
   list-style: none;
   display: inline-flex;
   align-items: center;
@@ -635,8 +638,10 @@ section > h2:first-child::before {
 .add-source[data-state="idle"]    > .add-source-trigger { display: inline-flex; }
 .add-source[data-state="open"]    > .add-source-form,
 .add-source[data-state="loading"] > .add-source-form { display: inline-flex; }
-.add-source[data-state="success"] > .add-source-status,
-.add-source[data-state="error"]   > .add-source-status { display: block; }
+.add-source[data-state="success"]    > .add-source-status,
+.add-source[data-state="error"]      > .add-source-status { display: block; }
+.add-source[data-state="processing"] > .add-source-processing { display: flex; }
+.add-source[data-state="done"]       > .add-source-done { display: block; }
 
 .add-source-trigger {
   width: 42px;
@@ -784,6 +789,71 @@ section > h2:first-child::before {
   animation: status-out 0.45s cubic-bezier(0.4, 0, 0.6, 1) forwards;
 }
 
+.add-source-processing {
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  color: var(--fg-muted);
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  animation: status-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.add-source-processing::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1.8px solid var(--fg-faint);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.add-source-done {
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  color: var(--fg-muted);
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--rule));
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  animation: status-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.add-source-done-label {
+  display: block;
+  font-weight: 500;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+.add-source-concepts {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+}
+.add-source-concepts li a {
+  color: var(--fg-strong);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+.add-source-concepts li a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.add-source-done-empty {
+  color: var(--fg-faint);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 @keyframes status-in {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -837,28 +907,28 @@ section > h2:first-child::before {
   );
 }
 .login-form h1 {
-  font-family: var(--font-sans);
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-weight: 400;
   letter-spacing: -0.025em;
   text-align: center;
   margin: 0 0 0.3em;
 }
 .login-form-subtitle {
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
   color: var(--fg-faint);
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  font-weight: 600;
+  font-weight: 400;
   margin: 0 0 2.2rem;
 }
 .login-form label {
   display: block;
-  font-family: var(--font-sans);
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--fg-faint);
@@ -890,8 +960,8 @@ section > h2:first-child::before {
 .login-form button[type="submit"] {
   width: 100%;
   padding: 0.78rem;
-  font-size: 0.92rem;
-  font-weight: 650;
+  font-size: 0.82rem;
+  font-weight: 400;
   background: var(--accent);
   color: var(--accent-contrast);
   border: none;
@@ -916,7 +986,7 @@ section > h2:first-child::before {
 }
 .notfound h1 {
   font-size: clamp(4rem, 12vw, 6.5rem);
-  font-weight: 750;
+  font-weight: 400;
   margin: 0 0 0.1em;
   letter-spacing: -0.04em;
   color: var(--accent-dim);

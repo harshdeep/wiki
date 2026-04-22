@@ -35,4 +35,14 @@
   </form>
 
   <div class="add-source-status" role="status" aria-live="polite"></div>
+
+  <div class="add-source-processing" role="status" aria-live="polite">
+    <span class="add-source-processing-label">Scraping and extracting concepts…</span>
+  </div>
+
+  <div class="add-source-done" role="status" aria-live="polite">
+    <span class="add-source-done-label">Extracted:</span>
+    <ul class="add-source-concepts"></ul>
+    <span class="add-source-done-empty" hidden>No new concepts this time.</span>
+  </div>
 </div>

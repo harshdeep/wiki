@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -14,8 +13,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from . import auth, nkr_client, sources_writer, sync
+from .nkr_client import get_status as _nkr_status
 from .content import holder
-from .slugs import slugify as _slugify
 
 logging.basicConfig(
     level=logging.INFO,
@@ -216,12 +215,15 @@ async def add_source(
             return RedirectResponse(f"/sources/{existing.slug}", status_code=303)
 
     t = topic.strip() or None
-    path = await asyncio.to_thread(sources_writer.write_source, u, t)
-    await nkr_client.trigger_process()
-    slug = _slugify(path.stem)
+    await nkr_client.trigger_add(u, t)
     if wants_json:
-        return JSONResponse({"slug": slug})
-    return RedirectResponse(f"/sources/{slug}", status_code=303)
+        return JSONResponse({"status": "queued"})
+    return RedirectResponse("/", status_code=303)
+
+
+@app.get("/sources/status")
+async def source_status(_: None = Depends(require_auth)):
+    return JSONResponse(_nkr_status())
 
 
 @app.get("/sources/{slug}", response_class=HTMLResponse)
